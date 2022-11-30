@@ -31,8 +31,7 @@ class encrypt{
 void encrypt:: key_schedule(vector<int> &key){
 
     int temp[256];
-   // cout<<"start";
-
+   
     for(int i=0;i<256;i++){
             s[i]=i;
             temp[i]=key[i%key.size()];
@@ -46,9 +45,7 @@ void encrypt:: key_schedule(vector<int> &key){
         swap(s[i],s[j]);
     }
 
-    for(int i=0;i<256;i++){
-       // cout<<i<<" "<<s[i]<<endl;
-    }
+   
 
 }
 
