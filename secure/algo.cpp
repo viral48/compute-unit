@@ -5,32 +5,70 @@ using namespace std;
 
 class encrypt{
     protected:
-public:
-    string plaintext;
-    string output;
+ 
+ 
+    string plaintext;   //Original string
+    string output;      //Encrypted string
 
-    vector<int> key;
-    int s[256];
+    unsigned char checksum;
+    vector<int> key;        // vector of Master key
+    int s[256];              // array of Algorithm generated key
 
-  encrypt(string masterkey,string plaintext){
+    // algorithm works in two parts
+
+  void key_schedule(vector<int> &key);       //1. Getting  algorithm genrated Key in array s 
+  void get_encrypt();                         //2. Using generated key apply operation on string
+  void add_checksum();                         // Add the checksum value at the end of the encrypted output
+ 
+  encrypt()=default;
+   encrypt(string masterkey,string plaintext){
         this->plaintext=plaintext;
         this->output=plaintext;
+
+        // coverting master key string to int vector of master key
         for(int i=0;i<masterkey.length();i++){
             this->key.push_back(masterkey[i]);
         }
 
     key_schedule(key);
     get_encrypt();
+    add_checksum();
   }
+public:
+  string  get_output(){             // Returns the encrypted or decrypted string
+    return output;
+   }
 
-  void key_schedule(vector<int> &key);
-  void get_encrypt();
 
 };
 
 class decrypt : public encrypt{
     public:
-    decrypt(string masterkey,string plaintext) : encrypt(masterkey, plaintext){}
+    decrypt(string masterkey,string plaintext) {
+            this->plaintext=plaintext;
+            this->output=plaintext;
+            for(int i=0;i<masterkey.length();i++){
+                this->key.push_back(masterkey[i]);
+            }
+            add_checksum();                 // checksum value of the received message is added at the end
+            rm_checksum();                  // checksum value is removed to decrypt message
+            key_schedule(key);              // decryption done with the same method as encryption
+            get_encrypt();                      
+
+
+
+    }
+    bool check_checksum(){
+        return (checksum==0)?true:false;
+    }
+
+    void rm_checksum(){
+        if(output.size()!=0){
+            output.erase(output.size()-1);
+            output.erase(output.size()-1);
+        }
+    }
+
 };
 
 
@@ -68,6 +106,45 @@ void encrypt:: get_encrypt(){
     }
 }
 
+// string encrypt:: get_output(){
+//     return output;
+// }
 
+
+void encrypt:: add_checksum(){
+    vector<unsigned char> text(output.length());
+    
+    for(int i=0;i<output.size();i++){
+        text[i]=output[i];
+    }
+    
+    int sum=0;
+  // algorithm for checksum
+    for(int i=0;i<output.length();i++){
+    
+        if(sum+text[i]>255){
+    
+            sum+=text[i];
+    
+            sum=sum^(1<<8);
+            sum+=1;
+    
+        }
+        else{
+        sum+=text[i];
+    
+        }
+        
+    }
+    
+    for(int i=0;i<8;i++){
+       sum^=(1<<i);
+    }
+     checksum=sum;
+    output+=checksum;
+
+    //
+      
+}
 
 
