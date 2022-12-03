@@ -19,7 +19,8 @@ class encrypt{
   void key_schedule(vector<int> &key);       //1. Getting  algorithm genrated Key in array s 
   void get_encrypt();                         //2. Using generated key apply operation on string
   void add_checksum();                         // Add the checksum value at the end of the encrypted output
- 
+
+ public:
   encrypt()=default;
    encrypt(string masterkey,string plaintext){
         this->plaintext=plaintext;
@@ -34,7 +35,7 @@ class encrypt{
     get_encrypt();
     add_checksum();
   }
-public:
+
   string  get_output(){             // Returns the encrypted or decrypted string
     return output;
    }
